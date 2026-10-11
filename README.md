@@ -56,9 +56,9 @@ Vite incrusta en el JavaScript compilado cualquier variable `VITE_*`. Si `VITE_P
 VITE_PRIVATE_TOKEN= npm run cap:sync
 ```
 
-### CORS en la API
+### Login TOTP en el APK
 
-Si el login por cookie falla desde el WebView (`https://localhost`), añade ese origen a `API_CORS_ORIGINS` en Electrolineras, o usa **token privado** en la pantalla de login (recomendado en app nativa).
+En el APK la web corre en `https://localhost` y la API está en otro dominio, así que el WebView trataría la cookie de sesión (`SameSite=Lax`) como de terceros y no la enviaría. Por eso `capacitor.config.ts` activa `CapacitorHttp` y `CapacitorCookies`: las peticiones salen por la pila HTTP nativa de Android, que guarda la sesión. En el navegador (`npm run dev`) el proxy de Vite sirve la API en el mismo origen.
 
 ## Relación con el monolito
 

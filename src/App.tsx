@@ -40,7 +40,7 @@ export function App() {
       {
         lat: nearest.location.lat,
         lon: nearest.location.lon,
-        radiusM: 15_000,
+        radiusM: 10_000, // máximo que admite /stations/nearby (NEARBY_RADIUS_M_MAX)
         minKw: apiQuery.minKw,
         maxKw: apiQuery.maxKw,
         publicOpenOnly: true,

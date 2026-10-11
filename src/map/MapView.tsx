@@ -1,9 +1,13 @@
 import * as maplibregl from 'maplibre-gl'
 import type { Map as MapLibreMap, Marker } from 'maplibre-gl'
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { useEffect, useRef } from 'react'
 import 'maplibre-gl/dist/maplibre-gl.css'
 
 import type { Station } from '../api/types'
+
+// maplibre 6 carga su worker desde un fichero aparte que Vite no copia por sí solo.
+maplibregl.setWorkerUrl(workerUrl)
 
 const STYLE = 'https://tiles.openfreemap.org/styles/liberty'
 

@@ -1,8 +1,10 @@
 # Electrolineras Cercanas
 
-Spinoff de [Electrolineras](https://github.com/jualas/electrolineras) orientado a **Android**: localizar el cargador más cercano (GPS o búsqueda de sitio) respetando el filtro de potencia.
+App Android que complementa a [Electrolineras](https://github.com/jualas/electrolineras): encuentra el cargador más cercano que cumple tu filtro de potencia y **manda su ubicación al Tesla** para que el coche navegue hasta él.
 
-**Fuera de alcance a propósito:** planificador de rutas / OSRM (consume demasiados recursos en el miniPC). La navegación se delega a **Google Maps**.
+Electrolineras es la herramienta completa para planificar viajes (búsqueda en corredor de ruta, plan de carga, asistente IA). Durante el viaje basta con algo más directo: abrir la app, ver el cargador adecuado más cercano y enviarlo al coche, sin gestionar rutas ni paradas.
+
+**Fuera de alcance a propósito:** planificador de rutas / OSRM (consume demasiados recursos en el miniPC). La navegación la hacen el propio coche o Google Maps.
 
 ## Qué incluye
 
@@ -10,7 +12,9 @@ Spinoff de [Electrolineras](https://github.com/jualas/electrolineras) orientado 
 - **Filtro de potencia** (Viaje, Ultra, Lento, Todo, personalizado…) persistido en el dispositivo
 - **Búsqueda de ubicación** (geocode Nominatim vía API existente) como punto de referencia alternativo al GPS
 - Mapa MapLibre con tu posición, el resultado y cargadores cercanos
+- **Enviar al Tesla**: comparte el cargador con la app de Tesla con el mismo formato que usa Google Maps (menú «Compartir» nativo o intent directo a la app), y el coche lo recibe como destino
 - **Navegar** abre Google Maps (sin calcular ruta en nuestro backend)
+- **Copiar coordenadas** como alternativa
 - Login TOTP o token privado (`X-Private-Token`), misma API que `electro.jualas.es`
 
 ## Stack

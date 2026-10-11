@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "App Android (Capacitor) para encontrar el cargador más cercano. Sin rutas OSRM.",
+  "description": "App Android (Capacitor), complemento de Electrolineras: cargador más cercano por potencia y envío del destino al Tesla.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

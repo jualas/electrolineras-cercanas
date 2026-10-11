@@ -1,6 +1,6 @@
 # Electrolineras Cercanas
 
-Spinoff de [Electrolineras](../Electrolineras) orientado a **Android**: localizar el cargador más cercano (GPS o búsqueda de sitio) respetando el filtro de potencia.
+Spinoff de [Electrolineras](https://github.com/jualas/electrolineras) orientado a **Android**: localizar el cargador más cercano (GPS o búsqueda de sitio) respetando el filtro de potencia.
 
 **Fuera de alcance a propósito:** planificador de rutas / OSRM (consume demasiados recursos en el miniPC). La navegación se delega a **Google Maps**.
 
@@ -22,7 +22,7 @@ Spinoff de [Electrolineras](../Electrolineras) orientado a **Android**: localiza
 ## Desarrollo web
 
 ```bash
-cd /mnt/datos/Proyectos/ElectrolinerasCercanas
+cd electrolineras-cercanas
 cp .env.example .env   # opcional
 npm install
 npm run dev            # http://127.0.0.1:5174  (proxy a electro.jualas.es)
@@ -48,6 +48,14 @@ npx cap open android   # genera/firma APK desde Android Studio
 
 Permisos de ubicación los añade el plugin `@capacitor/geolocation`.
 
+### No metas el token en el APK
+
+Vite incrusta en el JavaScript compilado cualquier variable `VITE_*`. Si `VITE_PRIVATE_TOKEN` tiene valor al compilar, el token queda dentro del APK y cualquiera que lo tenga puede extraerlo. Para un APK que vaya a salir de tu dispositivo, compila sin él y entra con TOTP o pegando el token en la pantalla de login (se guarda solo en el dispositivo):
+
+```bash
+VITE_PRIVATE_TOKEN= npm run cap:sync
+```
+
 ### CORS en la API
 
 Si el login por cookie falla desde el WebView (`https://localhost`), añade ese origen a `API_CORS_ORIGINS` en Electrolineras, o usa **token privado** en la pantalla de login (recomendado en app nativa).
@@ -61,4 +69,8 @@ Si el login por cookie falla desde el WebView (`https://localhost`), añade ese 
 | Nominatim | opcional | solo geocode ligero |
 | Cliente mapas + rutas | web completa | mapa + Google Maps externo |
 
-Directorio: `/mnt/datos/Proyectos/ElectrolinerasCercanas` (repo independiente del monolito).
+Repo independiente del monolito: [jualas/electrolineras](https://github.com/jualas/electrolineras).
+
+## Licencia
+
+[MIT](LICENSE) © 2026 Juan Antonio Francés Pérez

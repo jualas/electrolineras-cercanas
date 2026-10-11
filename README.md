@@ -1,0 +1,64 @@
+# Electrolineras Cercanas
+
+Spinoff de [Electrolineras](../Electrolineras) orientado a **Android**: localizar el cargador más cercano (GPS o búsqueda de sitio) respetando el filtro de potencia.
+
+**Fuera de alcance a propósito:** planificador de rutas / OSRM (consume demasiados recursos en el miniPC). La navegación se delega a **Google Maps**.
+
+## Qué incluye
+
+- Botón / modo **Más cercano** → `GET /api/v1/stations/nearest-live`
+- **Filtro de potencia** (Viaje, Ultra, Lento, Todo, personalizado…) persistido en el dispositivo
+- **Búsqueda de ubicación** (geocode Nominatim vía API existente) como punto de referencia alternativo al GPS
+- Mapa MapLibre con tu posición, el resultado y cargadores cercanos
+- **Navegar** abre Google Maps (sin calcular ruta en nuestro backend)
+- Login TOTP o token privado (`X-Private-Token`), misma API que `electro.jualas.es`
+
+## Stack
+
+- React + Vite (UI)
+- Capacitor 7 (empaquetado Android)
+- Backend: API ya desplegada de Electrolineras (**sin** arrancar OSRM)
+
+## Desarrollo web
+
+```bash
+cd /mnt/datos/Proyectos/ElectrolinerasCercanas
+cp .env.example .env   # opcional
+npm install
+npm run dev            # http://127.0.0.1:5174  (proxy a electro.jualas.es)
+```
+
+Para APK, en `.env` deja:
+
+```env
+VITE_API_URL=https://electro.jualas.es
+```
+
+## Build Android
+
+Requisitos: Android Studio / SDK (`ANDROID_HOME`), JDK 21.
+
+```bash
+npm install
+npm run build
+npx cap add android    # solo la primera vez
+npm run cap:sync
+npx cap open android   # genera/firma APK desde Android Studio
+```
+
+Permisos de ubicación los añade el plugin `@capacitor/geolocation`.
+
+### CORS en la API
+
+Si el login por cookie falla desde el WebView (`https://localhost`), añade ese origen a `API_CORS_ORIGINS` en Electrolineras, o usa **token privado** en la pantalla de login (recomendado en app nativa).
+
+## Relación con el monolito
+
+| Pieza | Electrolineras | Este spinoff |
+|-------|----------------|--------------|
+| nearest-live / nearby / geocode | ✅ | consume |
+| along-route / charging-plan / OSRM | ✅ | ❌ no usa |
+| Nominatim | opcional | solo geocode ligero |
+| Cliente mapas + rutas | web completa | mapa + Google Maps externo |
+
+Directorio: `/mnt/datos/Proyectos/ElectrolinerasCercanas` (repo independiente del monolito).

@@ -1,0 +1,36 @@
+{
+  "name": "electrolineras-cercanas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "App Android (Capacitor) para encontrar el cargador más cercano. Sin rutas OSRM.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 5174",
+    "lint": "tsc --noEmit --pretty false",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android",
+    "android": "npm run cap:sync && npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/geolocation": "^7.1.5",
+    "@capacitor/preferences": "^7.0.2",
+    "@capacitor/share": "^7.0.4",
+    "@capacitor/status-bar": "^7.0.3",
+    "maplibre-gl": "^5.6.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "typescript": "~5.9.3",
+    "vite": "^8.1.0"
+  }
+}

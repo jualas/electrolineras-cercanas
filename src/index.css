@@ -343,3 +343,178 @@ input[type='search'],
     max-height: 55vh;
   }
 }
+
+/* Modo Ruta */
+.mode-tabs {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.mode-tabs__tab {
+  border: 0;
+  background: transparent;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.mode-tabs__tab--active {
+  background: var(--bg-deep);
+  color: #f4fff8;
+}
+
+.place-search__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.route-origin-hint {
+  margin: -0.4rem 0 0;
+  padding: 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.route-options {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0.85rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.55rem;
+}
+
+.route-options .result-card__hint {
+  margin: 0;
+}
+
+.route-options__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.route-options__go {
+  width: 100%;
+}
+
+.route-stations {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.route-stations > li {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.route-stations__item--selected {
+  border-color: var(--bg-deep) !important;
+}
+
+.route-stations__select {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem;
+  align-items: start;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.route-stations__km {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.route-stations__main {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.route-stations__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.route-stations__meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.route-stations__detail {
+  padding: 0 0.7rem 0.7rem;
+}
+
+.route-stations__detail .result-card__actions {
+  margin-top: 0.5rem;
+}
+
+.map-shell-wrap {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+}
+
+.map-error {
+  position: absolute;
+  inset: 50% 1rem auto;
+  transform: translateY(-50%);
+  margin: 0 auto;
+  max-width: 26rem;
+  padding: 0.85rem 1rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* Android 15+ dibuja la app bajo la barra de estado (edge-to-edge): respetar el hueco. */
+.app-header {
+  padding-top: max(0.85rem, env(safe-area-inset-top));
+  flex-wrap: wrap;
+}
+
+.boot,
+.login-gate {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+
+@media (max-width: 560px) {
+  .app-header {
+    gap: 0.5rem;
+  }
+
+  .app-header__actions {
+    width: 100%;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .app-header__actions .btn,
+  .mode-tabs__tab {
+    padding: 0.45rem 0.7rem;
+  }
+
+  .app-header__actions > .btn--ghost:last-child {
+    margin-left: auto;
+  }
+}

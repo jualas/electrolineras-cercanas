@@ -4,11 +4,12 @@ App Android que complementa a [Electrolineras](https://github.com/jualas/electro
 
 Electrolineras es la herramienta completa para planificar viajes (búsqueda en corredor de ruta, plan de carga, asistente IA). Durante el viaje basta con algo más directo: abrir la app, ver el cargador adecuado más cercano y enviarlo al coche, sin gestionar rutas ni paradas.
 
-**Fuera de alcance a propósito:** planificador de rutas / OSRM (consume demasiados recursos en el miniPC). La navegación la hacen el propio coche o Google Maps.
+**Fuera de alcance a propósito:** planificar paradas de carga (SOC, tiempos de carga). El modo **Ruta** solo muestra qué cargadores hay en el recorrido; la navegación la hacen el propio coche o Google Maps.
 
 ## Qué incluye
 
 - Botón / modo **Más cercano** → `GET /api/v1/stations/nearest-live`
+- Modo **Ruta** → `GET /api/v1/stations/along-route`: salida (GPS o lugar) y destino, ruta **más rápida** (prioriza la velocidad de las vías) o **menos km**, opción de evitar peajes y los cargadores del recorrido que cumplen el filtro de potencia, ordenados por kilómetro, con trazado en el mapa
 - **Filtro de potencia** (Viaje, Ultra, Lento, Todo, personalizado…) persistido en el dispositivo
 - **Búsqueda de ubicación** (geocode Nominatim vía API existente) como punto de referencia alternativo al GPS
 - Mapa MapLibre con tu posición, el resultado y cargadores cercanos
@@ -69,9 +70,10 @@ En el APK la web corre en `https://localhost` y la API está en otro dominio, as
 | Pieza | Electrolineras | Este spinoff |
 |-------|----------------|--------------|
 | nearest-live / nearby / geocode | ✅ | consume |
-| along-route / charging-plan / OSRM | ✅ | ❌ no usa |
+| along-route (OSRM) | ✅ | ✅ modo Ruta |
+| charging-plan (paradas) | ✅ | ❌ no usa |
 | Nominatim | opcional | solo geocode ligero |
-| Cliente mapas + rutas | web completa | mapa + Google Maps externo |
+| Cliente mapas + rutas | web completa | mapa con trazado + Google Maps externo |
 
 Repo independiente del monolito: [jualas/electrolineras](https://github.com/jualas/electrolineras).
 

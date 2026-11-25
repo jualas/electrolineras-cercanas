@@ -1,5 +1,3 @@
-import { useState } from 'react'
-
 import { formatDistanceKm, stationLabel } from '../api/nearby'
 import type { Station } from '../api/types'
 import {
@@ -11,11 +9,7 @@ import {
   type PowerPresetId,
 } from '../filters/powerPresets'
 import type { LiveNearestStatus } from '../hooks/useLiveNearestCharger'
-import {
-  copyCoordinates,
-  googleMapsDestinationUrl,
-  openInTeslaApp,
-} from '../navigation/externalMaps'
+import { StationActions } from './StationActions'
 
 type PowerChipsProps = {
   filter: PowerFilter
@@ -88,23 +82,8 @@ export function NearestResultCard({
   error,
   onRefresh,
 }: ResultCardProps) {
-  const [copyState, setCopyState] = useState<'idle' | 'ok' | 'error'>('idle')
-  const [teslaState, setTeslaState] = useState<
-    'idle' | 'ok' | 'copied' | 'cancelled' | 'error'
-  >('idle')
   const dist =
     distanceKm != null && distanceM != null ? formatDistanceKm(distanceKm, distanceM) : null
-
-  const teslaLabel =
-    teslaState === 'ok'
-      ? 'Elige Tesla…'
-      : teslaState === 'copied'
-        ? 'Coords copiadas'
-        : teslaState === 'cancelled'
-          ? 'Cancelado'
-          : teslaState === 'error'
-            ? 'No se pudo enviar'
-            : 'Enviar al Tesla'
 
   return (
     <section className="result-card" aria-label="Resultado más cercano">
@@ -136,53 +115,7 @@ export function NearestResultCard({
             </p>
             {station.location.address && <p className="result-card__addr">{station.location.address}</p>}
           </div>
-          <div className="result-card__actions">
-            <a
-              className="btn btn--primary"
-              href={googleMapsDestinationUrl(station.location.lat, station.location.lon)}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Navegar (Google Maps)
-            </a>
-            <button
-              type="button"
-              className="btn btn--secondary"
-              title="Abre Compartir → elige Tesla (igual que desde Google Maps). La app Tesla manda el destino al coche."
-              onClick={() => {
-                void openInTeslaApp(
-                  station.location.lat,
-                  station.location.lon,
-                  stationLabel(station),
-                ).then((result) => {
-                  if (result === 'share' || result === 'intent') {
-                    setTeslaState('ok')
-                  } else if (result === 'copied') {
-                    setTeslaState('copied')
-                  } else if (result === 'cancelled') {
-                    setTeslaState('cancelled')
-                  } else {
-                    setTeslaState('error')
-                  }
-                  window.setTimeout(() => setTeslaState('idle'), 2500)
-                })
-              }}
-            >
-              {teslaLabel}
-            </button>
-            <button
-              type="button"
-              className="btn btn--ghost"
-              onClick={() => {
-                void copyCoordinates(station.location.lat, station.location.lon).then((ok) => {
-                  setCopyState(ok ? 'ok' : 'error')
-                  window.setTimeout(() => setCopyState('idle'), 1500)
-                })
-              }}
-            >
-              {copyState === 'ok' ? 'Copiado' : copyState === 'error' ? 'Error' : 'Copiar coords'}
-            </button>
-          </div>
+          <StationActions station={station} />
         </>
       )}
     </section>

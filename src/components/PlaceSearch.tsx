@@ -7,9 +7,26 @@ type PlaceSearchProps = {
   onSelect: (place: GeocodeResult) => void
   onClear: () => void
   activeLabel: string | null
+  /** Título visible encima del campo (p. ej. «Destino»). */
+  title?: string
+  placeholder?: string
+  /** Prefijo del lugar elegido («Referencia», «Origen»…). */
+  activePrefix?: string
+  /** Texto del botón que deshace la elección; null lo oculta. */
+  clearLabel?: string | null
+  ariaLabel?: string
 }
 
-export function PlaceSearch({ onSelect, onClear, activeLabel }: PlaceSearchProps) {
+export function PlaceSearch({
+  onSelect,
+  onClear,
+  activeLabel,
+  title,
+  placeholder = 'Ciudad, dirección…',
+  activePrefix = 'Referencia',
+  clearLabel = 'Usar GPS',
+  ariaLabel = 'Buscar ubicación',
+}: PlaceSearchProps) {
   const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState<GeocodeResult[]>([])
   const [busy, setBusy] = useState(false)
@@ -36,12 +53,13 @@ export function PlaceSearch({ onSelect, onClear, activeLabel }: PlaceSearchProps
   }
 
   return (
-    <section className="place-search" aria-label="Buscar ubicación">
+    <section className="place-search" aria-label={ariaLabel}>
+      {title && <h2 className="place-search__title">{title}</h2>}
       <div className="place-search__row">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Ciudad, dirección…"
+          placeholder={placeholder}
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault()
@@ -56,10 +74,14 @@ export function PlaceSearch({ onSelect, onClear, activeLabel }: PlaceSearchProps
 
       {activeLabel && (
         <div className="place-search__active">
-          <span>Referencia: {activeLabel}</span>
-          <button type="button" className="btn btn--ghost" onClick={onClear}>
-            Usar GPS
-          </button>
+          <span>
+            {activePrefix}: {activeLabel}
+          </span>
+          {clearLabel && (
+            <button type="button" className="btn btn--ghost" onClick={onClear}>
+              {clearLabel}
+            </button>
+          )}
         </div>
       )}
 

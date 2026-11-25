@@ -1,17 +1,27 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { fetchNearbyStations } from './api/nearby'
-import type { GeocodeResult, Station } from './api/types'
+import type { AlongRouteResponse } from './api/route'
+import type { GeocodeResult, LatLon, Station } from './api/types'
 import { useAuthGate } from './auth/AuthGate'
 import { NearestResultCard, PowerChips } from './components/NearestPanel'
 import { PlaceSearch } from './components/PlaceSearch'
+import { RoutePanel } from './components/RoutePanel'
 import { formatPowerRange } from './filters/powerPresets'
 import { useLiveNearestCharger } from './hooks/useLiveNearestCharger'
 import { usePowerFilter } from './hooks/usePowerFilter'
 import { MapView } from './map/MapView'
 
+type AppMode = 'nearest' | 'route'
+
 export function App() {
   const auth = useAuthGate()
+  const [mode, setMode] = useState<AppMode>('nearest')
+  const [routeResult, setRouteResult] = useState<AlongRouteResponse | null>(null)
+  const [routeOrigin, setRouteOrigin] = useState<LatLon | null>(null)
+  const [selectedRouteStationId, setSelectedRouteStationId] = useState<string | null>(null)
+  const handleRouteOrigin = useCallback((origin: LatLon | null) => setRouteOrigin(origin), [])
+  const routeMode = mode === 'route'
   const { filter, setPreset, setCustomRange, apiQuery } = usePowerFilter('trip')
   const [place, setPlace] = useState<GeocodeResult | null>(null)
   const [active, setActive] = useState(true)
@@ -20,7 +30,8 @@ export function App() {
   const [nearbyStations, setNearbyStations] = useState<Station[]>([])
 
   const nearest = useLiveNearestCharger({
-    active: auth.authenticated && active,
+    // En modo Ruta se pausa el «más cercano» (GPS continuo y consultas periódicas).
+    active: auth.authenticated && active && !routeMode,
     minKw: apiQuery.minKw,
     maxKw: apiQuery.maxKw,
     adHocOnly,
@@ -31,7 +42,7 @@ export function App() {
   const powerHint = useMemo(() => formatPowerRange(filter), [filter])
 
   useEffect(() => {
-    if (!auth.authenticated || !nearest.location) {
+    if (!auth.authenticated || routeMode || !nearest.location) {
       setNearbyStations([])
       return
     }
@@ -57,6 +68,7 @@ export function App() {
     return () => controller.abort()
   }, [
     auth.authenticated,
+    routeMode,
     nearest.location?.lat,
     nearest.location?.lon,
     apiQuery.minKw,
@@ -90,16 +102,38 @@ export function App() {
       <header className="app-header">
         <div>
           <p className="brand">Electrolineras</p>
-          <h1>Cercanas</h1>
+          <h1>{routeMode ? 'Ruta' : 'Cercanas'}</h1>
         </div>
         <div className="app-header__actions">
-          <button
-            type="button"
-            className={`btn ${active ? 'btn--primary' : 'btn--secondary'}`}
-            onClick={() => setActive((value) => !value)}
-          >
-            {active ? 'Más cercano ON' : 'Más cercano OFF'}
-          </button>
+          <div className="mode-tabs" role="tablist" aria-label="Modo">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={!routeMode}
+              className={`mode-tabs__tab ${!routeMode ? 'mode-tabs__tab--active' : ''}`}
+              onClick={() => setMode('nearest')}
+            >
+              Cercano
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={routeMode}
+              className={`mode-tabs__tab ${routeMode ? 'mode-tabs__tab--active' : ''}`}
+              onClick={() => setMode('route')}
+            >
+              Ruta
+            </button>
+          </div>
+          {!routeMode && (
+            <button
+              type="button"
+              className={`btn ${active ? 'btn--primary' : 'btn--secondary'}`}
+              onClick={() => setActive((value) => !value)}
+            >
+              {active ? 'Más cercano ON' : 'Más cercano OFF'}
+            </button>
+          )}
           <button type="button" className="btn btn--ghost" onClick={() => void auth.logout()}>
             Salir
           </button>
@@ -108,50 +142,81 @@ export function App() {
 
       <div className="app-body">
         <aside className="sidebar">
-          <PlaceSearch
-            activeLabel={place?.label ?? null}
-            onSelect={(item) => setPlace(item)}
-            onClear={() => {
-              setPlace(null)
-              nearest.clearManualOverride()
-            }}
-          />
-
-          <PowerChips filter={filter} onPresetChange={setPreset} onCustomRangeChange={setCustomRange} />
-
-          <div className="toggles">
-            <label>
-              <input type="checkbox" checked={adHocOnly} onChange={(e) => setAdHocOnly(e.target.checked)} />
-              Solo ad‑hoc / pago al momento
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={excludeParking}
-                onChange={(e) => setExcludeParking(e.target.checked)}
+          {routeMode ? (
+            <RoutePanel
+              minKw={apiQuery.minKw}
+              maxKw={apiQuery.maxKw}
+              powerHint={powerHint}
+              filters={
+                <PowerChips filter={filter} onPresetChange={setPreset} onCustomRangeChange={setCustomRange} />
+              }
+              result={routeResult}
+              onResult={setRouteResult}
+              selectedStationId={selectedRouteStationId}
+              onSelectStation={setSelectedRouteStationId}
+              onOriginChange={handleRouteOrigin}
+            />
+          ) : (
+            <>
+              <PlaceSearch
+                activeLabel={place?.label ?? null}
+                onSelect={(item) => setPlace(item)}
+                onClear={() => {
+                  setPlace(null)
+                  nearest.clearManualOverride()
+                }}
               />
-              Excluir parking
-            </label>
-          </div>
 
-          <NearestResultCard
-            status={nearest.status}
-            station={nearest.station}
-            distanceKm={nearest.distanceKm}
-            distanceM={nearest.distanceM}
-            usedMinKw={nearest.usedMinKw}
-            powerHint={powerHint}
-            error={nearest.error}
-            onRefresh={nearest.refresh}
-          />
+              <PowerChips filter={filter} onPresetChange={setPreset} onCustomRangeChange={setCustomRange} />
+
+              <div className="toggles">
+                <label>
+                  <input type="checkbox" checked={adHocOnly} onChange={(e) => setAdHocOnly(e.target.checked)} />
+                  Solo ad‑hoc / pago al momento
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={excludeParking}
+                    onChange={(e) => setExcludeParking(e.target.checked)}
+                  />
+                  Excluir parking
+                </label>
+              </div>
+
+              <NearestResultCard
+                status={nearest.status}
+                station={nearest.station}
+                distanceKm={nearest.distanceKm}
+                distanceM={nearest.distanceM}
+                usedMinKw={nearest.usedMinKw}
+                powerHint={powerHint}
+                error={nearest.error}
+                onRefresh={nearest.refresh}
+              />
+            </>
+          )}
         </aside>
 
         <main className="map-pane">
-          <MapView
-            user={nearest.location ? { lat: nearest.location.lat, lon: nearest.location.lon } : null}
-            station={nearest.station}
-            nearby={nearbyStations}
-          />
+          {routeMode ? (
+            <MapView
+              user={routeOrigin}
+              station={
+                routeResult?.results.find((item) => item.station.id === selectedRouteStationId)?.station ?? null
+              }
+              nearby={routeResult?.results.map((item) => item.station) ?? []}
+              onSelectStation={(item) => setSelectedRouteStationId(item.id)}
+              route={routeResult?.route_geometry ?? null}
+              followNearest={false}
+            />
+          ) : (
+            <MapView
+              user={nearest.location ? { lat: nearest.location.lat, lon: nearest.location.lon } : null}
+              station={nearest.station}
+              nearby={nearbyStations}
+            />
+          )}
         </main>
       </div>
     </div>
